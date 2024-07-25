@@ -797,6 +797,20 @@ SELECT_TYPES = [
     #
     ###
     GrowattModbusSelectEntityDescription(
+        name = "Power On/Off",
+        key = "power_on_off",
+        register = 0,
+        option_dict = {
+                0: "Standby:Off, Output:On",
+                1: "Standby:On, Output:On",
+                256: "Standby:Off, Output:Off",
+                257: "Standby:On, Output:Off",
+            },
+        allowedtypes = SPF,
+        entity_category = EntityCategory.CONFIG,
+        icon = "mdi:dip-switch",
+    ),
+    GrowattModbusSelectEntityDescription(
         name = "State Power",
         key = "state_power",
         register = 1,
@@ -1657,6 +1671,17 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
     # SPF Holding registers
     #
     ###
+    GrowattModbusSensorEntityDescription(
+        name = "Power On/Off",
+        key = "power_on_off",
+        register = 0,
+        scale = { 0: "Standby:Off, Output:On",
+                1: "Standby:On, Output:On",
+                256: "Standby:Off, Output:Off",
+                257: "Standby:On, Output:Off", },
+        allowedtypes = SPF,
+        entity_registry_enabled_default = False,
+    ),
     GrowattModbusSensorEntityDescription(
         name = "State Power",
         key = "state_power",
@@ -4792,7 +4817,7 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
         state_class = SensorStateClass.MEASUREMENT,
         register = 69,
         register_type = REG_INPUT,
-        unit = REGISTER_U32,
+        unit = REGISTER_S32,
         scale = 0.1,
         rounding = 1,
         allowedtypes = SPF,
@@ -4867,7 +4892,7 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
         native_unit_of_measurement = PERCENTAGE,
         register = 81,
         register_type = REG_INPUT,
-        scale = 0.1,
+        scale = 1,
         rounding = 1,
         allowedtypes = SPF,
     ),
@@ -4877,7 +4902,7 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
         native_unit_of_measurement = PERCENTAGE,
         register = 82,
         register_type = REG_INPUT,
-        scale = 0.1,
+        scale = 1,
         rounding = 1,
         allowedtypes = SPF,
     ),
@@ -4915,6 +4940,7 @@ class growatt_plugin(plugin_base):
         elif seriesnumber.startswith('AH1'):  invertertype = PV | GEN2 | X1 # Hybrid SPH 4kW - 10kW
         elif seriesnumber.startswith('067'):  invertertype = HYBRID | SPF | X1 # Hybrid SPF 3kW - ?kW
         elif seriesnumber.startswith('500'):  invertertype = HYBRID | SPF | X1 # Hybrid SPF 5kW
+        elif seriesnumber.startswith('113'):  invertertype = HYBRID | SPF | X1 # Hybrid SPF 5kW
         #elif seriesnumber.startswith('SPA'):  invertertype = AC | GEN | X3 # AC SPA 4kW - 10kW
 
         else:

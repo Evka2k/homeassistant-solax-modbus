@@ -382,6 +382,17 @@ NUMBER_TYPES = [
         allowedtypes = ALL_GEN_GROUP,
     ),
     GrowattModbusNumberEntityDescription(
+        name = "Max AC Charge Current",
+        key = "max_ac_charge_current",
+        register = 38,
+        fmt = "i",
+        native_min_value = 0,
+        native_max_value = 100,
+        native_step = 1,
+        native_unit_of_measurement = UnitOfElectricCurrent.AMPERE,
+        allowedtypes = SPF,
+    ),
+    GrowattModbusNumberEntityDescription(
         name = "Grid Export Limit",
         key = "grid_export_limit",
         register = 123,
@@ -1270,6 +1281,20 @@ SELECT_TYPES = [
     # SPF Selects
     #
     ###
+    GrowattModbusSelectEntityDescription(
+        name = "Power On/Off",
+        key = "power_on_off",
+        register = 0,
+        option_dict = {
+                0: "Standby:Off, Output:On",
+                1: "Standby:On, Output:On",
+                256: "Standby:Off, Output:Off",
+                257: "Standby:On, Output:Off",
+            },
+        allowedtypes = SPF,
+        entity_category = EntityCategory.CONFIG,
+        icon = "mdi:dip-switch",
+    ),
     GrowattModbusSelectEntityDescription(
         name = "State Power",
         key = "state_power",
@@ -2161,6 +2186,17 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
     # SPF Holding registers
     #
     ###
+    GrowattModbusSensorEntityDescription(
+        name = "Power On/Off",
+        key = "power_on_off",
+        register = 0,
+        scale = { 0: "Standby:Off, Output:On",
+                1: "Standby:On, Output:On",
+                256: "Standby:Off, Output:Off",
+                257: "Standby:On, Output:Off", },
+        allowedtypes = SPF,
+        entity_registry_enabled_default = False,
+    ),
     GrowattModbusSensorEntityDescription(
         name = "State Power",
         key = "state_power",
@@ -5868,7 +5904,7 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
         state_class = SensorStateClass.MEASUREMENT,
         register = 69,
         register_type = REG_INPUT,
-        unit = REGISTER_U32,
+        unit = REGISTER_S32,
         scale = 0.1,
         rounding = 1,
         allowedtypes = SPF,
@@ -5943,7 +5979,7 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
         native_unit_of_measurement = PERCENTAGE,
         register = 81,
         register_type = REG_INPUT,
-        scale = 0.1,
+        scale = 1,
         rounding = 1,
         allowedtypes = SPF,
     ),
@@ -5953,7 +5989,7 @@ SENSOR_TYPES: list[GrowattModbusSensorEntityDescription] = [
         native_unit_of_measurement = PERCENTAGE,
         register = 82,
         register_type = REG_INPUT,
-        scale = 0.1,
+        scale = 1,
         rounding = 1,
         allowedtypes = SPF,
     ),
@@ -6004,6 +6040,7 @@ class growatt_plugin(plugin_base):
         elif seriesnumber.startswith('V'):  invertertype = HYBRID | GEN4 | X3 # Hybrid TL3-XH 2.5kW - 10kW (MOD)
         elif seriesnumber.startswith('067'):  invertertype = HYBRID | SPF | X1 # Hybrid SPF 5kW
         elif seriesnumber.startswith('500'):  invertertype = HYBRID | SPF | X1 # Hybrid SPF 5kW
+        elif seriesnumber.startswith('113'):  invertertype = HYBRID | SPF | X1 # Hybrid SPF 5kW
         #elif seriesnumber.startswith('SPA'):  invertertype = AC | GEN2 | X3 # AC SPA 4kW - 10kW Could be based SPF?
         
         else:
